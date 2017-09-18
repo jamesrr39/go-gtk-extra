@@ -1,21 +1,19 @@
-package image_gtk_image_bridge
+package gotk3extra
 
 import (
 	"image"
 
-	"github.com/mattn/go-gtk/gdkpixbuf"
-	"github.com/mattn/go-gtk/gtk"
+	"github.com/gotk3/gotk3/gdk"
 )
 
-func NewGtkImageFromImage(picture image.Image) *gtk.Image {
-	return gtk.NewImageFromPixbuf(NewGdkPixBufFromImage(picture))
-}
-
-func NewGdkPixBufFromImage(picture image.Image) *gdkpixbuf.Pixbuf {
+func PixBufFromImage(picture image.Image) (*gdk.Pixbuf, error) {
 	width := picture.Bounds().Max.X
 	height := picture.Bounds().Max.Y
 
-	pixbuf := gdkpixbuf.NewPixbuf(gdkpixbuf.GDK_COLORSPACE_RGB, true, 8, width, height)
+	pixbuf, err := gdk.PixbufNew(gdk.COLORSPACE_RGB, true, 8, width, height)
+	if nil != err {
+		return nil, err
+	}
 	pixelSlice := pixbuf.GetPixels()
 
 	const bytesPerPixel = 4
@@ -34,7 +32,7 @@ func NewGdkPixBufFromImage(picture image.Image) *gdkpixbuf.Pixbuf {
 		}
 	}
 
-	return pixbuf
+	return pixbuf, nil
 }
 
 func uint32ColourToByte(value uint32) byte {
